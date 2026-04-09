@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}SBT Pipeline — Accueil{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color:var(--blue-900)">
+            <i class="bi bi-diagram-3-fill me-2" style="color:var(--blue-500)"></i>
+            SBT Intelligence Pipeline
+        </h2>
+        <p class="mb-0" style="color:#64748b">Recherche, scraping et analyse de prospects B2B — marchés internationaux</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge" style="background:var(--blue-100);color:var(--blue-700);font-size:0.75rem;padding:6px 12px;border-radius:20px">
+            <i class="bi bi-circle-fill me-1" style="font-size:0.5rem;color:#22c55e"></i>
+            Système opérationnel
+        </span>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row mb-4 g-3">
+    <div class="col-md-3">
+        <div class="card stat-card blue">
+            <div class="stat-icon"><i class="bi bi-collection"></i></div>
+            <div class="number">{{ stats.total }}</div>
+            <div class="label">Résultats totaux</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card orange">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="number">{{ stats.pending }}</div>
+            <div class="label">En attente</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card green">
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="number">{{ stats.scraped }}</div>
+            <div class="label">Scrapés avec succès</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card red">
+            <div class="stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="number">{{ stats.error }}</div>
+            <div class="label">Erreurs</div>
+        </div>
+    </div>
+</div>
+
+<!-- Pipeline Control -->
+<div class="pipeline-section mb-4">
+    <h5 class="fw-semibold mb-3" style="color:var(--blue-800)">
+        <i class="bi bi-gear-wide-connected me-2" style="color:var(--blue-500)"></i>
+        Contrôle du Pipeline
+    </h5>
+    <div class="row g-3">
+        <!-- Target Searcher -->
+        <div class="col-md-4">
+            <div class="pipeline-card">
+                <div class="pipeline-icon" style="background:linear-gradient(135deg,var(--blue-100),#e0edff)">
+                    <i class="bi bi-search" style="color:var(--blue-600);font-size:1.4rem"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <h6 class="fw-bold mb-0" style="color:var(--blue-900)">Target Searcher</h6>
+                        <span id="status-searcher" class="agent-status">
+                            <i class="bi bi-circle"></i> Prêt
+                        </span>
+                    </div>
+                    <p class="small mb-3" style="color:#64748b">Recherche Serper + classification hybride TF-IDF + Claude AI</p>
+                    <button class="btn-pipeline-run" onclick="runAgent('searcher', {max_per_query: 5})">
+                        <i class="bi bi-play-fill me-1"></i> Lancer la recherche
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrapper Agent -->
+        <div class="col-md-4">
+            <div class="pipeline-card">
+                <div class="pipeline-icon" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)">
+                    <i class="bi bi-globe" style="color:#16a34a;font-size:1.4rem"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <h6 class="fw-bold mb-0" style="color:var(--blue-900)">Scrapper Agent</h6>
+                        <span id="status-scrapper" class="agent-status">
+                            <i class="bi bi-circle"></i> Prêt
+                        </span>
+                    </div>
+                    <p class="small mb-3" style="color:#64748b">Crawl4AI multi-pages + extraction LLM + stockage Neo4j</p>
+                    <button class="btn-pipeline-run" style="background:linear-gradient(135deg,#16a34a,#15803d)"
+                            onclick="runAgent('scrapper', {})">
+                        <i class="bi bi-play-fill me-1"></i> Lancer le scraping
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marketing Agent -->
+        <div class="col-md-4">
+            <div class="pipeline-card">
+                <div class="pipeline-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+                    <i class="bi bi-bar-chart-line" style="color:#d97706;font-size:1.4rem"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <h6 class="fw-bold mb-0" style="color:var(--blue-900)">Marketing Agent</h6>
+                        <span id="status-marketing" class="agent-status">
+                            <i class="bi bi-circle"></i> Prêt
+                        </span>
+                    </div>
+                    <p class="small mb-3" style="color:#64748b">Analyse prospects & concurrents + pitchs commerciaux + export CSV</p>
+                    <button class="btn-pipeline-run" style="background:linear-gradient(135deg,#d97706,#b45309)"
+                            onclick="runAgent('marketing')">
+                        <i class="bi bi-play-fill me-1"></i> Lancer l'analyse
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lancer pipeline complet -->
+<div class="card mb-4" style="background:linear-gradient(135deg,var(--blue-900),var(--blue-700));border:none;border-radius:16px">
+    <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        <div>
+            <h5 class="fw-bold text-white mb-1">
+                <i class="bi bi-lightning-charge-fill me-2" style="color:#fbbf24"></i>
+                Pipeline complet automatique
+            </h5>
+            <p class="mb-0" style="color:rgba(255,255,255,0.7);font-size:0.9rem">
+                Exécute Searcher → Scrapper → Marketing en séquence
+            </p>
+        </div>
+        <button class="btn text-white px-4 py-2 fw-semibold"
+                style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;backdrop-filter:blur(10px)"
+                onclick="runFullPipeline()">
+            <i class="bi bi-play-circle-fill me-2"></i> Lancer tout
+        </button>
+    </div>
+</div>
+
+<!-- Accès rapide -->
+<h5 class="fw-semibold mb-3" style="color:var(--blue-800)">
+    <i class="bi bi-grid me-2" style="color:var(--blue-500)"></i>
+    Accès rapide
+</h5>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="/dashboard" class="card text-decoration-none quick-link-card"
+           style="border-left:4px solid var(--blue-500)">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;background:var(--blue-100);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="bi bi-table" style="color:var(--blue-600);font-size:1.3rem"></i>
+                </div>
+                <div>
+                    <div class="fw-bold" style="color:var(--blue-700)">Dashboard</div>
+                    <div class="small" style="color:#64748b">Toutes les entreprises & statuts</div>
+                </div>
+                <i class="bi bi-arrow-right ms-auto" style="color:var(--blue-400)"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="/graph" class="card text-decoration-none quick-link-card"
+           style="border-left:4px solid #16a34a">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;background:#dcfce7;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="bi bi-bezier2" style="color:#16a34a;font-size:1.3rem"></i>
+                </div>
+                <div>
+                    <div class="fw-bold" style="color:#15803d">Graphe Neo4j</div>
+                    <div class="small" style="color:#64748b">Relations inter-entreprises</div>
+                </div>
+                <i class="bi bi-arrow-right ms-auto" style="color:#86efac"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="/marketing" class="card text-decoration-none quick-link-card"
+           style="border-left:4px solid #d97706">
+            <div class="card-body p-4 d-flex align-items-center gap-3">
+                <div style="width:48px;height:48px;background:#fef3c7;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="bi bi-megaphone" style="color:#d97706;font-size:1.3rem"></i>
+                </div>
+                <div>
+                    <div class="fw-bold" style="color:#b45309">Marketing</div>
+                    <div class="small" style="color:#64748b">Pitchs & plan de ciblage</div>
+                </div>
+                <i class="bi bi-arrow-right ms-auto" style="color:#fcd34d"></i>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+.pipeline-section { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(37,99,235,0.06); border: 1px solid var(--blue-100); }
+.pipeline-card { display: flex; align-items: flex-start; gap: 16px; background: var(--white); border: 1px solid var(--blue-100); border-radius: 14px; padding: 20px; transition: all 0.2s; box-shadow: 0 1px 4px rgba(37,99,235,0.06); }
+.pipeline-card:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.12); transform: translateY(-2px); border-color: var(--blue-300); }
+.pipeline-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btn-pipeline-run { background: linear-gradient(135deg,var(--blue-600),var(--blue-700)); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%; }
+.btn-pipeline-run:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+.quick-link-card { border-radius: 12px; border: 1px solid var(--blue-100); transition: all 0.2s; }
+.quick-link-card:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.1); transform: translateY(-2px); }
+</style>
+<script>
+async function runFullPipeline() {
+    const agents = [
+        { name: 'searcher', params: { max_per_query: 5 } },
+        { name: 'scrapper', params: {} },
+        { name: 'marketing', params: {} },
+    ];
+    for (const agent of agents) {
+        await new Promise(resolve => {
+            const origStatus = document.getElementById(`status-${agent.name}`);
+            if (origStatus) origStatus.innerHTML = '<span class="agent-dot" style="background:#f59e0b"></span> En cours...';
+            setTimeout(resolve, 500);
+        });
+        runAgent(agent.name, agent.params);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+}
+
+// Counters are animated by base.html's DOMContentLoaded
+</script>
+{% endblock %}

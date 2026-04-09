@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+{% block title %}Marketing — SBT Pipeline{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color:var(--blue-900)">
+            <i class="bi bi-megaphone-fill me-2" style="color:var(--blue-500)"></i>
+            Analyse Marketing
+        </h2>
+        <p class="mb-0" style="color:#64748b">Prospects, concurrents et pitchs commerciaux personnalisés</p>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <span id="status-marketing" class="agent-badge agent-ready">
+            <span class="agent-dot"></span> Prêt
+        </span>
+        <button class="btn d-flex align-items-center gap-2 px-4 py-2 fw-semibold"
+                style="background:linear-gradient(135deg,var(--blue-600),var(--blue-700));color:white;border:none;border-radius:10px;box-shadow:0 4px 12px rgba(37,99,235,0.3)"
+                onclick="runAgent('marketing')">
+            <i class="bi bi-play-fill"></i> Lancer l'analyse
+        </button>
+    </div>
+</div>
+
+<!-- Prospects Tabs -->
+<div class="d-flex gap-2 mb-4 flex-wrap">
+    <button class="filter-tab active" data-view="all" onclick="switchView('all', this)">
+        <i class="bi bi-grid me-1"></i> Vue complète
+    </button>
+    <button class="filter-tab" data-view="tier1" onclick="switchView('tier1', this)"
+            style="--tab-color:var(--blue-600);--tab-bg:var(--blue-100)">
+        <i class="bi bi-building me-1"></i> Tier 1 — Fabricants
+        <span class="ms-1" style="background:var(--blue-100);color:var(--blue-700);border-radius:10px;padding:1px 7px;font-size:0.75rem">{{ data.tier1|length }}</span>
+    </button>
+    <button class="filter-tab" data-view="tier2" onclick="switchView('tier2', this)"
+            style="--tab-color:#16a34a;--tab-bg:#dcfce7">
+        <i class="bi bi-gear me-1"></i> Tier 2 — Sous-traitants
+        <span class="ms-1" style="background:#dcfce7;color:#15803d;border-radius:10px;padding:1px 7px;font-size:0.75rem">{{ data.tier2|length }}</span>
+    </button>
+</div>
+
+<!-- Tier 1 + Tier 2 Row -->
+<div id="view-all">
+<div class="row g-3 mb-4">
+    <!-- Tier 1 -->
+    <div class="col-md-6" id="view-tier1-col">
+        <div class="card" style="border:1px solid var(--blue-100);border-radius:14px;overflow:hidden">
+            <div style="background:linear-gradient(135deg,var(--blue-700),var(--blue-600));padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-building-fill text-white"></i>
+                    <span class="fw-bold text-white">Tier 1 — Fabricants coffrets</span>
+                </div>
+                <span style="background:rgba(255,255,255,0.2);color:white;border-radius:20px;padding:4px 12px;font-size:0.8rem;font-weight:700">
+                    {{ data.tier1|length }} prospects
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if data.tier1 %}
+                <div class="table-responsive">
+                    <table class="table mb-0" style="font-size:0.875rem">
+                        <thead>
+                            <tr style="background:#f8faff">
+                                <th style="padding:10px 16px;color:var(--blue-700);font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid var(--blue-100)">Nom</th>
+                                <th style="padding:10px 16px;color:var(--blue-700);font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid var(--blue-100)">Email</th>
+                                <th style="padding:10px 16px;color:var(--blue-700);font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid var(--blue-100)">Pays</th>
+                                <th style="padding:10px 16px;color:var(--blue-700);font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid var(--blue-100)">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for c in data.tier1 %}
+                        <tr style="border-bottom:1px solid #f1f5f9"
+                            onmouseover="this.style.background='#f8faff'" onmouseout="this.style.background=''">
+                            <td style="padding:10px 16px;font-weight:500">
+                                {% if c.website %}
+                                <a href="{{ c.website }}" target="_blank" class="text-decoration-none"
+                                   style="color:var(--blue-600)">{{ c.name }}</a>
+                                {% else %}
+                                <span style="color:#334155">{{ c.name }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding:10px 16px;color:#64748b;font-size:0.82rem">{{ c.email or '—' }}</td>
+                            <td style="padding:10px 16px">
+                                <span style="font-size:0.82rem;color:#475569;display:flex;align-items:center;gap:4px">
+                                    <i class="bi bi-geo-alt" style="color:var(--blue-400)"></i>{{ c.country or '—' }}
+                                </span>
+                            </td>
+                            <td style="padding:10px 16px">
+                                {% if c.confidence %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width:50px;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden">
+                                        <div style="height:100%;width:{{ (c.confidence * 100)|int }}%;background:linear-gradient(90deg,var(--blue-400),var(--blue-600));border-radius:3px"></div>
+                                    </div>
+                                    <span style="font-size:0.75rem;color:#94a3b8">{{ (c.confidence * 100)|int }}%</span>
+                                </div>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="padding:32px;text-align:center;color:#94a3b8">
+                    <i class="bi bi-building" style="font-size:2rem;display:block;opacity:0.3;margin-bottom:8px"></i>
+                    <p class="mb-0 small">Aucune entreprise Tier 1<br>Lancez d'abord le Searcher + Scrapper</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tier 2 -->
+    <div class="col-md-6" id="view-tier2-col">
+        <div class="card" style="border:1px solid #bbf7d0;border-radius:14px;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#15803d,#16a34a);padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-gear-fill text-white"></i>
+                    <span class="fw-bold text-white">Tier 2 — Sous-traitants câblage</span>
+                </div>
+                <span style="background:rgba(255,255,255,0.2);color:white;border-radius:20px;padding:4px 12px;font-size:0.8rem;font-weight:700">
+                    {{ data.tier2|length }} prospects
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if data.tier2 %}
+                <div class="table-responsive">
+                    <table class="table mb-0" style="font-size:0.875rem">
+                        <thead>
+                            <tr style="background:#f0fdf4">
+                                <th style="padding:10px 16px;color:#15803d;font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid #bbf7d0">Nom</th>
+                                <th style="padding:10px 16px;color:#15803d;font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid #bbf7d0">Email</th>
+                                <th style="padding:10px 16px;color:#15803d;font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid #bbf7d0">Pays</th>
+                                <th style="padding:10px 16px;color:#15803d;font-weight:600;font-size:0.78rem;text-transform:uppercase;border-bottom:1px solid #bbf7d0">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for c in data.tier2 %}
+                        <tr style="border-bottom:1px solid #f0fdf4"
+                            onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background=''">
+                            <td style="padding:10px 16px;font-weight:500">
+                                {% if c.website %}
+                                <a href="{{ c.website }}" target="_blank" class="text-decoration-none"
+                                   style="color:#16a34a">{{ c.name }}</a>
+                                {% else %}
+                                <span style="color:#334155">{{ c.name }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding:10px 16px;color:#64748b;font-size:0.82rem">{{ c.email or '—' }}</td>
+                            <td style="padding:10px 16px">
+                                <span style="font-size:0.82rem;color:#475569;display:flex;align-items:center;gap:4px">
+                                    <i class="bi bi-geo-alt" style="color:#4ade80"></i>{{ c.country or '—' }}
+                                </span>
+                            </td>
+                            <td style="padding:10px 16px">
+                                {% if c.confidence %}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width:50px;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden">
+                                        <div style="height:100%;width:{{ (c.confidence * 100)|int }}%;background:linear-gradient(90deg,#4ade80,#16a34a);border-radius:3px"></div>
+                                    </div>
+                                    <span style="font-size:0.75rem;color:#94a3b8">{{ (c.confidence * 100)|int }}%</span>
+                                </div>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="padding:32px;text-align:center;color:#94a3b8">
+                    <i class="bi bi-gear" style="font-size:2rem;display:block;opacity:0.3;margin-bottom:8px"></i>
+                    <p class="mb-0 small">Aucune entreprise Tier 2<br>Lancez d'abord le Searcher + Scrapper</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section résultats LLM — Plan de ciblage -->
+<div id="marketing-results" style="display:none" class="mb-4">
+    <div class="card" style="border:1px solid var(--blue-100);border-radius:14px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,var(--blue-900),var(--blue-700));padding:16px 20px">
+            <h5 class="fw-bold text-white mb-0">
+                <i class="bi bi-lightbulb-fill me-2" style="color:#fbbf24"></i>
+                Plan de ciblage — Stratégie commerciale
+            </h5>
+        </div>
+        <div class="card-body p-4" id="targeting-content">
+            <p style="color:#94a3b8">Lancez l'agent marketing pour voir les résultats ici.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Section Pitchs personnalisés -->
+<div id="pitches-section" style="display:none">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold mb-0" style="color:var(--blue-900)">
+            <i class="bi bi-envelope-paper-fill me-2" style="color:var(--blue-500)"></i>
+            Pitchs commerciaux personnalisés
+            <span id="pitch-count" style="background:var(--blue-100);color:var(--blue-700);border-radius:20px;padding:3px 12px;font-size:0.8rem;font-weight:700;margin-left:8px">0</span>
+        </h5>
+        <button class="btn btn-sm d-flex align-items-center gap-1 px-3"
+                style="background:var(--blue-100);color:var(--blue-700);border:1px solid var(--blue-200);border-radius:8px;font-weight:600"
+                onclick="expandAllPitches()">
+            <i class="bi bi-arrows-expand"></i> Tout développer
+        </button>
+    </div>
+    <div id="pitches-container"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function switchView(view, btn) {
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const origRunAgent = window.runAgent;
+    if (origRunAgent) {
+        window.runAgent = function(name, params) {
+            origRunAgent(name, params);
+            if (name === 'marketing') pollMarketingResults();
+        };
+    }
+    loadMarketingResults();
+});
+
+function pollMarketingResults() {
+    const interval = setInterval(async () => {
+        try {
+            const resp = await fetch('/api/status');
+            const data = await resp.json();
+            if (!data.marketing_running) {
+                clearInterval(interval);
+                loadMarketingResults();
+            }
+        } catch(e) {}
+    }, 3000);
+}
+
+async function loadMarketingResults() {
+    try {
+        const resp = await fetch('/api/marketing-results');
+        if (!resp.ok) return;
+        const data = await resp.json();
+
+        if (data.targeting_plan && Object.keys(data.targeting_plan).length > 0) {
+            const section = document.getElementById('marketing-results');
+            const content = document.getElementById('targeting-content');
+            section.style.display = '';
+            let html = '<div class="row g-3">';
+
+            const priorities = [
+                { key: 'priorité_1', label: 'PRIORITÉ 1', color: '#dc2626', bg: '#fee2e2', border: '#fecaca' },
+                { key: 'priorité_2', label: 'PRIORITÉ 2', color: '#d97706', bg: '#fef3c7', border: '#fde68a' },
+                { key: 'priorité_3', label: 'PRIORITÉ 3', color: '#64748b', bg: '#f1f5f9', border: '#e2e8f0' },
+            ];
+
+            for (const { key, label, color, bg, border } of priorities) {
+                const p = data.targeting_plan[key];
+                if (!p) continue;
+                html += `
+                <div class="col-md-4">
+                    <div style="background:${bg};border:1px solid ${border};border-radius:12px;padding:16px;height:100%">
+                        <span style="background:${color};color:white;border-radius:6px;padding:3px 10px;font-size:0.75rem;font-weight:700">${label}</span>
+                        <div class="fw-bold mt-2 mb-1" style="color:#1e293b">${(p.entreprises||[]).join(', ')}</div>
+                        <div class="small mb-1" style="color:${color}"><i class="bi bi-lightning-fill me-1"></i>${p.action || ''}</div>
+                        <div class="small" style="color:#64748b"><i class="bi bi-chat-quote me-1"></i>${p.message_cle || ''}</div>
+                    </div>
+                </div>`;
+            }
+            html += '</div>';
+
+            if (data.targeting_plan.conseil_global) {
+                html += `
+                <div style="background:linear-gradient(135deg,var(--blue-50,#eff6ff),#e0edff);border:1px solid var(--blue-100);border-radius:12px;padding:16px;margin-top:16px">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-info-circle-fill mt-1" style="color:var(--blue-500);flex-shrink:0"></i>
+                        <span style="color:var(--blue-800)">${data.targeting_plan.conseil_global}</span>
+                    </div>
+                </div>`;
+            }
+
+            // Competitor analysis
+            if (data.competitor_analysis && typeof data.competitor_analysis === 'string') {
+                html += `
+                <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:16px;margin-top:16px">
+                    <h6 class="fw-bold mb-2" style="color:#b91c1c">
+                        <i class="bi bi-shield-exclamation me-2"></i>Analyse des concurrents
+                    </h6>
+                    <p style="color:#64748b;font-size:0.9rem;margin:0;white-space:pre-wrap">${data.competitor_analysis}</p>
+                </div>`;
+            }
+
+            content.innerHTML = html;
+        }
+
+        if (data.pitches && data.pitches.length > 0) {
+            const section = document.getElementById('pitches-section');
+            const container = document.getElementById('pitches-container');
+            document.getElementById('pitch-count').textContent = data.pitches.length;
+            section.style.display = '';
+
+            let html = '';
+            data.pitches.forEach((pitch, i) => {
+                const isHaute = pitch.priority === 'haute';
+                const isTier1 = pitch.tier === 1;
+                const priorityStyle = isHaute
+                    ? 'background:#fee2e2;color:#b91c1c;border-color:#fecaca'
+                    : 'background:#fef3c7;color:#b45309;border-color:#fde68a';
+                const tierStyle = isTier1
+                    ? 'background:var(--blue-100);color:var(--blue-700)'
+                    : 'background:#dcfce7;color:#15803d';
+
+                html += `
+                <div style="border:1px solid var(--blue-100);border-radius:14px;margin-bottom:12px;overflow:hidden" class="pitch-card">
+                    <div class="pitch-header d-flex align-items-center gap-3 p-4"
+                         style="cursor:pointer;background:white;transition:background 0.15s"
+                         onmouseover="this.style.background='#f8faff'" onmouseout="this.style.background='white'"
+                         onclick="togglePitch(${i})">
+                        <span style="${priorityStyle};border:1px solid;border-radius:20px;padding:3px 10px;font-size:0.72rem;font-weight:700">
+                            ${isHaute ? '▲ HAUTE' : '▼ MOYENNE'}
+                        </span>
+                        <span style="${tierStyle};border-radius:6px;padding:3px 8px;font-size:0.75rem;font-weight:600">
+                            Tier ${pitch.tier}
+                        </span>
+                        <span class="fw-bold" style="color:var(--blue-900)">${pitch.company}</span>
+                        <span class="ms-auto small" style="color:#94a3b8;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pitch.subject || ''}</span>
+                        <i class="bi bi-chevron-down pitch-chevron" id="chevron-${i}" style="color:var(--blue-400);transition:transform 0.2s"></i>
+                    </div>
+                    <div id="pitch-body-${i}" style="display:none;background:#fafbff;border-top:1px solid var(--blue-100);padding:24px">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div style="background:linear-gradient(135deg,var(--blue-50,#eff6ff),#e8f0ff);border:1px solid var(--blue-100);border-radius:10px;padding:12px 16px">
+                                    <span style="font-size:0.75rem;font-weight:700;color:var(--blue-600);text-transform:uppercase;letter-spacing:0.05em">
+                                        <i class="bi bi-key me-1"></i> Argument clé
+                                    </span>
+                                    <p class="mb-0 mt-1" style="color:#334155">${pitch.key_argument || ''}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div style="border:1px solid var(--blue-100);border-radius:10px;overflow:hidden">
+                                    <div style="background:var(--blue-600);padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+                                        <span class="text-white fw-semibold" style="font-size:0.85rem">
+                                            <i class="bi bi-envelope-fill me-2"></i>Email commercial
+                                        </span>
+                                        <button onclick="copyText(this, 'email-${i}')" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer">
+                                            <i class="bi bi-clipboard"></i> Copier
+                                        </button>
+                                    </div>
+                                    <div id="email-${i}" style="padding:14px;background:white;white-space:pre-wrap;font-size:0.85rem;color:#334155;max-height:200px;overflow-y:auto">${pitch.pitch_email || ''}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div style="border:1px solid #bbf7d0;border-radius:10px;overflow:hidden">
+                                    <div style="background:#16a34a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+                                        <span class="text-white fw-semibold" style="font-size:0.85rem">
+                                            <i class="bi bi-linkedin me-2"></i>Message LinkedIn
+                                        </span>
+                                        <button onclick="copyText(this, 'linkedin-${i}')" style="background:rgba(255,255,255,0.2);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer">
+                                            <i class="bi bi-clipboard"></i> Copier
+                                        </button>
+                                    </div>
+                                    <div id="linkedin-${i}" style="padding:14px;background:white;white-space:pre-wrap;font-size:0.85rem;color:#334155;max-height:200px;overflow-y:auto">${pitch.pitch_linkedin || ''}</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div style="background:#f8faff;border:1px solid var(--blue-100);border-radius:10px;padding:12px 16px">
+                                    <span style="font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Stratégie de relance
+                                    </span>
+                                    <p class="mb-0 mt-1" style="color:#475569;font-size:0.875rem">${pitch.follow_up || ''}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+    } catch(e) {
+        console.error('Erreur chargement résultats marketing:', e);
+    }
+}
+
+function togglePitch(i) {
+    const body = document.getElementById(`pitch-body-${i}`);
+    const chevron = document.getElementById(`chevron-${i}`);
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function expandAllPitches() {
+    document.querySelectorAll('[id^="pitch-body-"]').forEach((el, i) => {
+        el.style.display = 'block';
+        const chevron = document.getElementById(`chevron-${i}`);
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+    });
+}
+
+function copyText(btn, elId) {
+    const el = document.getElementById(elId);
+    if (el) {
+        navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check"></i> Copié !';
+            setTimeout(() => btn.innerHTML = orig, 2000);
+        });
+    }
+}
+</script>
+{% endblock %}

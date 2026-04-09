@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SBT Intelligence{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════
+           VARIABLES & RESET
+        ═══════════════════════════════════════ */
+        :root {
+            --blue-900: #0c2461;
+            --blue-800: #1a3a7c;
+            --blue-700: #1e4db7;
+            --blue-600: #2563eb;
+            --blue-500: #3b82f6;
+            --blue-400: #60a5fa;
+            --blue-300: #93c5fd;
+            --blue-100: #dbeafe;
+            --blue-50:  #eff6ff;
+            --gray-900: #111827;
+            --gray-700: #374151;
+            --gray-500: #6b7280;
+            --gray-300: #d1d5db;
+            --gray-100: #f3f4f6;
+            --white:    #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 16px rgba(37,99,235,.10), 0 2px 8px rgba(0,0,0,.06);
+            --shadow-lg: 0 10px 40px rgba(37,99,235,.15), 0 4px 16px rgba(0,0,0,.08);
+            --radius:   14px;
+            --radius-sm: 8px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: #f0f4ff;
+            color: var(--gray-900);
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 0.925rem;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════════════
+           NAVBAR
+        ═══════════════════════════════════════ */
+        .navbar {
+            background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%) !important;
+            border-bottom: none !important;
+            padding: 0 1.5rem;
+            box-shadow: 0 4px 24px rgba(12,36,97,.35);
+            height: 64px;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white !important;
+            letter-spacing: -.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-brand .brand-icon {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,.15);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .nav-link {
+            color: rgba(255,255,255,.75) !important;
+            font-weight: 500;
+            padding: .5rem 1rem !important;
+            border-radius: var(--radius-sm);
+            transition: all .2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .nav-link:hover { color: white !important; background: rgba(255,255,255,.1); }
+        .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,.18);
+            font-weight: 600;
+        }
+        .nav-badge {
+            font-size: .65rem;
+            padding: 2px 6px;
+            border-radius: 20px;
+            background: rgba(255,255,255,.2);
+            color: white;
+        }
+
+        /* ═══════════════════════════════════════
+           LAYOUT
+        ═══════════════════════════════════════ */
+        .main-content {
+            padding: 2rem 2.5rem;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* ═══════════════════════════════════════
+           CARDS
+        ═══════════════════════════════════════ */
+        .card {
+            background: var(--white);
+            border: 1.5px solid rgba(37,99,235,.08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow .25s, transform .2s;
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card-header {
+            background: transparent;
+            border-bottom: 1.5px solid var(--gray-100);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+            color: var(--gray-900);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card-header .header-icon {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .9rem;
+        }
+
+        /* ═══════════════════════════════════════
+           STAT CARDS
+        ═══════════════════════════════════════ */
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+        .stat-card.blue::before   { background: var(--blue-500); }
+        .stat-card.green::before  { background: #10b981; }
+        .stat-card.orange::before { background: #f59e0b; }
+        .stat-card.red::before    { background: #ef4444; }
+        .stat-card.purple::before { background: #8b5cf6; }
+
+        .stat-card .stat-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin: 0 auto 1rem;
+        }
+        .stat-card.blue   .stat-icon { background: var(--blue-50);  color: var(--blue-600); }
+        .stat-card.green  .stat-icon { background: #ecfdf5; color: #059669; }
+        .stat-card.orange .stat-icon { background: #fffbeb; color: #d97706; }
+        .stat-card.red    .stat-icon { background: #fef2f2; color: #dc2626; }
+        .stat-card.purple .stat-icon { background: #f5f3ff; color: #7c3aed; }
+
+        .stat-card .number {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -1px;
+            color: var(--gray-900);
+        }
+        .stat-card .label {
+            color: var(--gray-500);
+            font-size: .78rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: .35rem;
+        }
+
+        /* ═══════════════════════════════════════
+           BUTTONS
+        ═══════════════════════════════════════ */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+            border: none;
+            font-weight: 600;
+            padding: .55rem 1.4rem;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 8px rgba(37,99,235,.3);
+            transition: all .2s;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--blue-700), var(--blue-600));
+            box-shadow: 0 4px 16px rgba(37,99,235,.4);
+            transform: translateY(-1px);
+        }
+        .btn-outline-primary {
+            color: var(--blue-600);
+            border-color: var(--blue-600);
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            transition: all .2s;
+        }
+        .btn-outline-primary:hover {
+            background: var(--blue-600); color: white;
+            box-shadow: 0 4px 12px rgba(37,99,235,.3);
+        }
+        .btn-sm { padding: .35rem .85rem; font-size: .82rem; }
+
+        /* ═══════════════════════════════════════
+           BADGES
+        ═══════════════════════════════════════ */
+        .badge { font-weight: 600; letter-spacing: .3px; border-radius: 20px; }
+        .badge-tier1  { background: #dcfce7; color: #166534; }
+        .badge-tier2  { background: var(--blue-100); color: var(--blue-700); }
+        .badge-tier3  { background: #fef3c7; color: #92400e; }
+        .badge-pending  { background: #fef3c7; color: #92400e; }
+        .badge-scraped  { background: #dcfce7; color: #166534; }
+        .badge-error    { background: #fee2e2; color: #991b1b; }
+
+        /* ═══════════════════════════════════════
+           TABLES
+        ═══════════════════════════════════════ */
+        .table { color: var(--gray-700); }
+        .table thead th {
+            background: var(--blue-50);
+            color: var(--blue-700);
+            font-weight: 600;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 2px solid var(--blue-100);
+            padding: .75rem 1rem;
+            white-space: nowrap;
+        }
+        .table tbody td {
+            padding: .75rem 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+        .table tbody tr { transition: background .15s; }
+        .table tbody tr:hover { background: var(--blue-50); }
+        .table tbody tr:last-child td { border-bottom: none; }
+
+        /* ═══════════════════════════════════════
+           PIPELINE CARDS
+        ═══════════════════════════════════════ */
+        .pipeline-card {
+            border-left: 4px solid var(--blue-300) !important;
+            transition: all .25s;
+        }
+        .pipeline-card:hover { border-left-color: var(--blue-600) !important; transform: translateX(2px); }
+        .pipeline-card.active-card { border-left-color: var(--blue-600) !important; }
+
+        /* ═══════════════════════════════════════
+           AGENT STATUS
+        ═══════════════════════════════════════ */
+        .agent-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: .8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+        .agent-status.running {
+            background: var(--blue-50);
+            color: var(--blue-600);
+            animation: pulse-bg 2s infinite;
+        }
+        .agent-status.done { background: #dcfce7; color: #166534; }
+        .agent-status.error { background: #fee2e2; color: #991b1b; }
+
+        @keyframes pulse-bg {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
+
+        .pulse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse-dot 1.2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: .6; }
+        }
+
+        /* ═══════════════════════════════════════
+           PROGRESS
+        ═══════════════════════════════════════ */
+        .score-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--blue-100);
+            overflow: hidden;
+            width: 70px;
+            display: inline-block;
+        }
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--blue-500), var(--blue-400));
+            transition: width .5s ease;
+        }
+
+        /* ═══════════════════════════════════════
+           PAGE HEADER
+        ═══════════════════════════════════════ */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        .page-header h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--blue-900);
+            letter-spacing: -.5px;
+            margin: 0;
+        }
+        .page-header .subtitle {
+            color: var(--gray-500);
+            font-size: .9rem;
+            margin-top: .25rem;
+        }
+
+        /* ═══════════════════════════════════════
+           SEARCH INPUT
+        ═══════════════════════════════════════ */
+        .search-input {
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: .45rem .9rem .45rem 2.2rem;
+            font-size: .85rem;
+            color: var(--gray-900);
+            background: white;
+            transition: all .2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--blue-500);
+            box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+        }
+        .search-wrapper { position: relative; }
+        .search-wrapper .bi-search {
+            position: absolute; left: .7rem; top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500); font-size: .85rem;
+        }
+
+        /* ═══════════════════════════════════════
+           FILTER TABS
+        ═══════════════════════════════════════ */
+        .filter-tab {
+            padding: .35rem .9rem;
+            border-radius: 20px;
+            font-size: .82rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            color: var(--gray-500);
+            background: transparent;
+            transition: all .2s;
+        }
+        .filter-tab:hover { background: var(--blue-50); color: var(--blue-600); }
+        .filter-tab.active {
+            background: var(--blue-600);
+            color: white;
+            border-color: var(--blue-600);
+        }
+
+        /* ═══════════════════════════════════════
+           TOAST
+        ═══════════════════════════════════════ */
+        #toast-container {
+            position: fixed; bottom: 24px; right: 24px;
+            z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: .88rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn .3s ease;
+            min-width: 240px;
+        }
+        .toast-item.info    { background: var(--blue-600); color: white; }
+        .toast-item.success { background: #059669; color: white; }
+        .toast-item.warning { background: #d97706; color: white; }
+        .toast-item.error   { background: #dc2626; color: white; }
+        @keyframes slideIn {
+            from { transform: translateX(60px); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        /* ═══════════════════════════════════════
+           ACCORDION (pitchs)
+        ═══════════════════════════════════════ */
+        .accordion-item {
+            border: 1.5px solid var(--blue-100) !important;
+            border-radius: var(--radius-sm) !important;
+            margin-bottom: .5rem;
+            overflow: hidden;
+        }
+        .accordion-button {
+            background: var(--blue-50) !important;
+            color: var(--gray-900) !important;
+            font-weight: 600 !important;
+            border: none !important;
+            padding: 1rem 1.25rem !important;
+        }
+        .accordion-button:not(.collapsed) {
+            background: var(--blue-100) !important;
+            box-shadow: none !important;
+        }
+        .accordion-button::after { filter: invert(30%) sepia(80%) saturate(600%) hue-rotate(200deg); }
+        .accordion-body { background: white; padding: 1.25rem; }
+
+        /* ═══════════════════════════════════════
+           GRAPH
+        ═══════════════════════════════════════ */
+        #graph-container {
+            width: 100%;
+            height: calc(100vh - 220px);
+            border: 1.5px solid var(--blue-100);
+            border-radius: var(--radius);
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+        #legend {
+            position: absolute; top: 12px; right: 12px;
+            background: white;
+            border: 1.5px solid var(--blue-100);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+            font-size: .8rem;
+        }
+        .legend-item {
+            display: flex; align-items: center;
+            gap: 8px; margin-bottom: 6px;
+            color: var(--gray-700);
+        }
+        .legend-dot  { width: 13px; height: 13px; border-radius: 50%; }
+        .legend-line { width: 22px; height: 3px; border-radius: 2px; }
+
+        /* ═══════════════════════════════════════
+           PITCH CARD
+        ═══════════════════════════════════════ */
+        .pitch-code-block {
+            background: var(--blue-50);
+            border: 1px solid var(--blue-100);
+            border-radius: var(--radius-sm);
+            padding: .85rem 1rem;
+            white-space: pre-wrap;
+            font-size: .85rem;
+            color: var(--gray-700);
+            line-height: 1.6;
+        }
+
+        /* ═══════════════════════════════════════
+           LINK
+        ═══════════════════════════════════════ */
+        a.company-link {
+            color: var(--blue-600);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a.company-link:hover { color: var(--blue-800); text-decoration: underline; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--gray-100); }
+        ::-webkit-scrollbar-thumb { background: var(--blue-300); border-radius: 3px; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <div class="brand-icon"><i class="bi bi-diagram-3-fill"></i></div>
+            SBT Intelligence
+        </a>
+        <div class="navbar-nav ms-auto d-flex flex-row gap-1 align-items-center">
+            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
+                <i class="bi bi-house-fill"></i> Accueil
+            </a>
+            <a class="nav-link {% if request.path == '/dashboard' %}active{% endif %}" href="/dashboard">
+                <i class="bi bi-table"></i> Dashboard
+            </a>
+            <a class="nav-link {% if request.path == '/graph' %}active{% endif %}" href="/graph">
+                <i class="bi bi-share-fill"></i> Graphe
+            </a>
+            <a class="nav-link {% if request.path == '/marketing' %}active{% endif %}" href="/marketing">
+                <i class="bi bi-megaphone-fill"></i> Marketing
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showToast(msg, type='info') {
+        const c = document.getElementById('toast-container');
+        const icons = {info:'info-circle-fill', success:'check-circle-fill', error:'x-circle-fill', warning:'exclamation-triangle-fill'};
+        const d = document.createElement('div');
+        d.className = `toast-item ${type}`;
+        d.innerHTML = `<i class="bi bi-${icons[type]||icons.info}"></i><span>${msg}</span>`;
+        c.appendChild(d);
+        setTimeout(() => {
+            d.style.opacity = '0';
+            d.style.transform = 'translateX(60px)';
+            d.style.transition = 'all .3s';
+            setTimeout(() => d.remove(), 300);
+        }, 4000);
+    }
+
+    function setAgentStatus(name, state, msg) {
+        const el = document.getElementById(`status-${name}`);
+        if (!el) return;
+        el.className = `agent-status ${state}`;
+        if (state === 'running') {
+            el.innerHTML = `<span class="pulse-dot"></span>${msg || 'En cours...'}`;
+        } else {
+            const icon = state === 'done' ? 'check-circle-fill' : state === 'error' ? 'x-circle-fill' : 'circle';
+            el.innerHTML = `<i class="bi bi-${icon}"></i>${msg || 'Prêt'}`;
+        }
+    }
+
+    function runAgent(name, params={}) {
+        setAgentStatus(name, 'running', 'Démarrage...');
+        fetch(`/api/run/${name}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(params)
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.error) { showToast(d.error, 'warning'); setAgentStatus(name, 'error', d.error); }
+            else { showToast(`${name} lancé avec succès`, 'success'); pollStatus(); }
+        })
+        .catch(e => { showToast('Erreur: ' + e, 'error'); setAgentStatus(name, 'error', 'Erreur'); });
+    }
+
+    function pollStatus() {
+        fetch('/api/status').then(r => r.json()).then(data => {
+            for (const [name, st] of Object.entries(data)) {
+                if (typeof st === 'object' && 'running' in st) {
+                    if (st.running) setAgentStatus(name, 'running', st.message);
+                    else if (st.message === 'Terminé') setAgentStatus(name, 'done', 'Terminé ✓');
+                    else if (st.message && st.message.startsWith('Erreur')) setAgentStatus(name, 'error', st.message);
+                }
+            }
+            if (Object.values(data).some(s => s && s.running)) {
+                setTimeout(pollStatus, 2000);
+            }
+        }).catch(() => {});
+    }
+    setInterval(pollStatus, 5000);
+
+    // Compteurs animés
+    function animateCount(el) {
+        const target = parseInt(el.textContent, 10);
+        if (isNaN(target) || target === 0) return;
+        let start = 0;
+        const duration = 800;
+        const step = Math.ceil(target / (duration / 16));
+        const timer = setInterval(() => {
+            start = Math.min(start + step, target);
+            el.textContent = start;
+            if (start >= target) clearInterval(timer);
+        }, 16);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.stat-card .number').forEach(animateCount);
+    });
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
